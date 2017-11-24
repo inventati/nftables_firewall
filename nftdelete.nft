@@ -1,0 +1,14 @@
+#!/usr/sbin/nft -f
+
+delete chain ip client new_in
+delete chain ip client new_out
+delete chain ip client established_in
+delete chain ip client established_out
+delete chain ip client related_in
+delete chain ip client related_out
+delete chain ip client outbound
+delete chain ip client inbound
+
+delete set client tor_ports
+
+delete table ip client

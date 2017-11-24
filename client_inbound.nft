@@ -1,0 +1,115 @@
+#
+# LOCAL DEFINITIONS
+#
+
+#define log_group = 2
+
+#
+# NEW INBOUND CONNECTIONS
+#
+
+#dhcp (broadcast offer - test rule dince ISC use raw packets)
+#add rule client new_in udp sport 67 udp dport 68 ip daddr 255.255.255.255
+
+#multicast/broadcast
+#add rule client new_in meta pkttype multicast
+#add rule client new_in meta pkttype broadcast
+
+#log
+add rule client new_in log group 2 prefix "drop-new_in"
+
+#
+# ESTABLISHED INBOUND
+#
+
+#dns
+add rule client established_in udp sport 53
+#add rule client established_in tcp sport 53
+
+#dnscrypt
+add rule client established_in udp sport $dnscrypt_port ip daddr $dnscrypt_server
+
+#http, https, oscp, crl
+add rule client established_in tcp sport { http, https }
+
+#rtmp/e (Flash Media server)
+add rule client established_in tcp sport 1935
+
+#ntp
+add rule client established_in udp sport 123 udp dport 123
+
+#pasive ftp
+add rule client established_in tcp sport 21
+add rule client established_in tcp sport >=1024 tcp dport >=1024
+
+#pop3
+#add rule client established_in tcp sport 110
+
+#pop3s
+#add rule client established_in tcp sport 995
+
+#smtp (MTA)
+#add rule client established_in tcp sport 25
+
+#smtps (MSA)
+#add rule client established_in tcp sport 587
+
+#smtps (MTA/MSA)
+add rule client established_in tcp sport 465
+
+#imap
+#add rule client established_in tcp sport 143
+
+#imaps
+add rule client established_in tcp sport 993
+
+#git
+add rule client established_in tcp sport 9418
+
+#bitcoin
+add rule client established_in tcp sport 8333
+
+#bitmessage (allow all not needed but asked)
+add rule client established_in tcp sport 8444
+#add rule client established_in tcp
+
+#chess (fics)
+add rule client established_in tcp sport 5000
+
+#tor
+add rule client established_in tcp sport @tor_ports
+
+#dhcp
+add rule client established_in udp sport 67 udp dport 68
+
+#ssh
+add rule client established_in tcp sport 22
+
+#reply to ping
+add rule client established_in icmp type echo-reply
+add rule client established_in icmp type destination-unreachable
+add rule client established_in icmp type time-exceeded
+
+#log
+add rule client established_in log group 2 prefix "drop-est-in"
+
+#
+# RELATED OUTBOUND
+#
+
+#multicast/broadcast
+#add rule client related_in meta pkttype multicast
+#add rule client related_in meta pkttype broadcast
+ 
+#traceroute reply
+add rule client related_in icmp type echo-reply
+add rule client related_in icmp type destination-unreachable
+add rule client related_in icmp type time-exceeded
+
+#active ftp
+add rule client related_in tcp sport 20
+
+#log
+add rule client related_in log group 2 prefix "drop-rel-in"
+
+

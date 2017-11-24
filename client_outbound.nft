@@ -1,0 +1,179 @@
+#!/usr/sbin/nft
+
+#
+# LOCAL DEFINITIONS
+#
+
+#define log_group = 2
+
+#
+# NEW OUTBOUND CONNECTIONS
+#
+
+#dns (should be used as client only)
+add rule client new_out udp dport 53
+#add rule client new_out tcp dport 53
+
+#dnscrypt
+add rule client new_out udp dport $dnscrypt_port ip daddr $dnscrypt_server
+
+#http, https, oscp, crl, tor
+add rule client new_out tcp dport { http, https }
+
+#rtmp/e (Flash Media Server)
+add rule client new_out tcp dport 1935
+
+#ntp
+add rule client new_out tcp sport 123 tcp dport 123
+
+#ftp (active and pasive)
+add rule client new_out tcp dport 21
+
+#pop3
+#add rule client new_out tcp dport 110
+
+#pop3s
+#add rule client new_out tcp dport 995
+
+#smtp (MTA)
+#add rule client new_out tcp dport 25
+
+#smtps (MSA)
+#add rule client new_out tcp dport 587
+
+#smtps (MTA/MSA)
+add rule client new_out tcp dport 465
+
+#imap
+#add rule client new_out tcp dport 143
+
+#imaps
+add rule client new_out tcp dport 993
+
+#ssh
+add rule client new_out tcp dport 22
+
+#git
+add rule client new_out tcp dport 9418
+
+#chess (fics)
+add rule client new_out tcp dport 5000
+
+#tor
+add rule client new_out tcp dport @tor_ports
+
+#ping
+add rule client new_out icmp type echo-request
+
+#traceroute
+add rule client new_out udp dport 33434-33523
+
+#bitcoin
+add rule client new_out tcp dport 8333
+
+#bitmessage (allow all not needed but asked)
+add rule client new_out tcp dport 8444
+#add rule client outbound tcp
+
+#dhcp
+add rule client new_out udp sport 68 udp dport 67
+
+#multicast/broadcast
+#add rule client new_out meta pkttype multicast
+#add rule client new_out meta pkttype broadcast
+
+#log
+add rule client new_out log group 2 prefix "drop-new-out"
+
+#
+# ESTABLISHED OUTBOUND
+#
+
+#dns (probably server uses too)
+add rule client established_out udp dport 53
+#add rule client established_out tcp dport 53
+
+#dnscrypt
+add rule client established_out udp dport $dnscrypt_port ip daddr $dnscrypt_server
+
+#http, https, oscp, crl
+add rule client established_out tcp dport { http, https }
+
+#rtmp/e (Flash media server)
+add rule client established_out udp dport 1935
+
+#ntp
+add rule client established_out udp sport 123 udp dport 123
+
+#pasive ftp
+add rule client established_out tcp dport 21
+add rule client established_out tcp sport >=1024 tcp dport >=1024
+
+#ssh (used by git for ssh)
+add rule client established_out tcp dport 22
+
+#pop3
+#add rule client established_out tcp dport 110
+
+#pop3s
+#add rule client established_out tcp dport 995
+
+#smtp (MTA)
+#add rule client established_out tcp dport 25
+
+#smtps (MSA)
+#add rule client established_out tcp dport 587
+
+#smtps (MTA/MSA)
+add rule client established_out tcp dport 465
+
+#imap
+#add rule client established_out tcp dport 143
+
+#imaps
+add rule client established_out tcp dport 993
+
+#git
+add rule client established_out tcp dport 9418
+
+#bitcoin
+add rule client established_out tcp dport 8333
+
+#bitmessage (allow all not neded)
+add rule client established_out tcp dport 8444
+#add rule client establieshed_out tcp
+
+#chess (fics)
+add rule client established_out tcp dport 5000
+
+#tor
+add rule client established_out tcp dport @tor_ports
+
+#dhcp
+add rule client established_out udp sport 68 udp dport 67
+
+#ping
+add rule client established_out icmp type echo-request
+
+#log
+add rule client established_out log group 2 prefix "drop-est-out"
+
+#
+# RELATED OUTBOUND
+#
+
+#pasive ftp
+add rule client related_out tcp sport >=1024 tcp dport >=1024
+
+#reply to dns
+add rule client related_out icmp type echo-reply
+
+#multicast
+#add rule client related_out meta pkttype multicast
+
+#broadcast
+#add rule client related_out meta pkttype broadcast
+
+#log
+add rule client related_out log group 2 prefix "drop-rel-out"
+
